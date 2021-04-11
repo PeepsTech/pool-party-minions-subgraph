@@ -7,7 +7,7 @@
 
 ### License
 
-The DAOhaus subgraphs are for querying data for Moloch DAOs built on the Moloch DAO framework smart contracts <https://github.com/MolochVentures/moloch>. 
+This subgraph is for querying data for Pool-Party minions built for the Moloch DAO smart contracts <https://github.com/MolochVentures/moloch>. 
 
 Copyright (C) 2021 Pool-Party 
 forked from (and major thanks to) DAOhaus https://github.com/HausDAO/daohaus-boosts
