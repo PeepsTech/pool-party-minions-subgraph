@@ -1,16 +1,16 @@
-# DAOHaus Boosts Subgraph
+# Pool-Party Minions Subgraph
 
 ### Current boost data indexed
 
-- Transmutations
-- Uberhaus Minion
+- AaveParty Minion 
 
 
 ### License
 
 The DAOhaus subgraphs are for querying data for Moloch DAOs built on the Moloch DAO framework smart contracts <https://github.com/MolochVentures/moloch>. 
 
-Copyright (C) 2021 DAOhaus
+Copyright (C) 2021 Pool-Party 
+forked from (and major thanks to) DAOhaus https://github.com/HausDAO/daohaus-boosts
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
