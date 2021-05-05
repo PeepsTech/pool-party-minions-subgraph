@@ -7,13 +7,16 @@ type Minion @entity {
   balances: [Balances!] @derivedFrom(field: "minion")
   deposits: [Deposits!] @derivedFrom(field: "minion")
   withdraws:[Withdraws!] @derivedFrom(field: "minion")
+  earningsTokens: [Bytes!]
   details: String!
   minionType: String!
+  protocol: Protocol!
 }
 
 type Proposals @entity{
   id: ID!
   minion: Minion!
+  proposer: Bytes!
   proposalId: BigInt!
   canceled: Boolean!
   executed: Boolean!
@@ -24,8 +27,8 @@ type Deposits @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  depositToken: [Token!] # address(es)
-  recieptToken: Token # address
+  depositToken: [Bytes!]! # address(es)
+  recieptToken: Bytes!# address
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -36,8 +39,8 @@ type Withdraws @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  withdrawToken: [Token!] # address
-  recieptToken: Token # address
+  withdrawToken: Bytes! # address
+  recieptToken: [Bytes!]! # address
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -48,19 +51,36 @@ type Loans @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  withdrawToken: [Token!] # address
-  recieptToken: Token # address
+  recieptToken: Bytes! # address
   amount: BigInt! # address
   protocol: Protocol! 
   details: String
 }
 
-type Token @entity {
+type Repayments @entity {
   id: ID!
-  minion: Minion!
-  tokenAddress: Bytes!
-  earningsStatus: Boolean # approved for use in earnings withdraws
-  tag: String #tag as LP or aToken, etc
+  dao: Bytes! # address
+  minion: Minion! # address
+  proposal: Proposals!
+  paymentToken: Bytes! # address
+  amount: BigInt! # address
+  protocol: Protocol! 
+  details: String
+}
+
+
+type Actions @entity{
+  id: ID!
+  dao: Bytes! # address
+  minion: Minion! # address 
+  token: Bytes!
+  amount: BigInt # address
+  proposal: Proposals!
+  data: Bytes
+  details: String
+  type: Bytes
+  protocol: Protocol! 
+
 }
 
 type Protocol @entity {
@@ -74,8 +94,23 @@ type Balances @entity {
   id: ID! 
   minion: Minion!
   protocol: Protocol
-  token: Token!
+  tokenAddress: Bytes!
   balance: BigInt!
+}
+
+type Members @entity {
+  id: ID!
+  minion: Minion!
+  memberAddress: Bytes!
+  rewards: [Rewards!] @derivedFrom(field: "member")
+}
+
+type Rewards @entity {
+  id: ID!
+  minion: Minion!
+  member: Members!
+  token: Bytes!
+  amount: BigInt!
 }
 
 

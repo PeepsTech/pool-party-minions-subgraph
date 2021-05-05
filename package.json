@@ -5,8 +5,7 @@
     "create": "graph create odyssy-automaton/daohaus-boosts --node https://api.thegraph.com/deploy/",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy-kovan": "node manifests/deploy-prep.js kovan && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohaus-boosts-kovan",
-    "deploy-xdai": "node manifests/deploy-prep.js xdai && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohaus-boosts-xdai",
+    "deploy-matic": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ wswarren12/pool-party-matic",
     "create-local": "graph create odyssy-automaton/daohaus-boosts --node http://127.0.0.1:8020",
     "deploy-local": "graph deploy odyssy-automaton/daohaus-boosts --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },

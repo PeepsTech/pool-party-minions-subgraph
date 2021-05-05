@@ -230,23 +230,6 @@ export class Proposals extends Entity {
     this.set("proposer", Value.fromBytes(value));
   }
 
-  get token(): Bytes | null {
-    let value = this.get("token");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set token(value: Bytes | null) {
-    if (value === null) {
-      this.unset("token");
-    } else {
-      this.set("token", Value.fromBytes(value as Bytes));
-    }
-  }
-
   get proposalId(): BigInt {
     let value = this.get("proposalId");
     return value.toBigInt();
@@ -332,38 +315,22 @@ export class Deposits extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get depositToken(): Array<Bytes> | null {
+  get depositToken(): Array<Bytes> {
     let value = this.get("depositToken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
+    return value.toBytesArray();
   }
 
-  set depositToken(value: Array<Bytes> | null) {
-    if (value === null) {
-      this.unset("depositToken");
-    } else {
-      this.set("depositToken", Value.fromBytesArray(value as Array<Bytes>));
-    }
+  set depositToken(value: Array<Bytes>) {
+    this.set("depositToken", Value.fromBytesArray(value));
   }
 
-  get recieptToken(): Bytes | null {
+  get recieptToken(): Bytes {
     let value = this.get("recieptToken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value.toBytes();
   }
 
-  set recieptToken(value: Bytes | null) {
-    if (value === null) {
-      this.unset("recieptToken");
-    } else {
-      this.set("recieptToken", Value.fromBytes(value as Bytes));
-    }
+  set recieptToken(value: Bytes) {
+    this.set("recieptToken", Value.fromBytes(value));
   }
 
   get amount(): BigInt {
@@ -468,21 +435,13 @@ export class Withdraws extends Entity {
     this.set("withdrawToken", Value.fromBytes(value));
   }
 
-  get recieptToken(): Array<Bytes> | null {
+  get recieptToken(): Array<Bytes> {
     let value = this.get("recieptToken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
+    return value.toBytesArray();
   }
 
-  set recieptToken(value: Array<Bytes> | null) {
-    if (value === null) {
-      this.unset("recieptToken");
-    } else {
-      this.set("recieptToken", Value.fromBytesArray(value as Array<Bytes>));
-    }
+  set recieptToken(value: Array<Bytes>) {
+    this.set("recieptToken", Value.fromBytesArray(value));
   }
 
   get amount(): BigInt {
@@ -578,21 +537,13 @@ export class Loans extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get recieptToken(): Bytes | null {
+  get recieptToken(): Bytes {
     let value = this.get("recieptToken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value.toBytes();
   }
 
-  set recieptToken(value: Bytes | null) {
-    if (value === null) {
-      this.unset("recieptToken");
-    } else {
-      this.set("recieptToken", Value.fromBytes(value as Bytes));
-    }
+  set recieptToken(value: Bytes) {
+    this.set("recieptToken", Value.fromBytes(value));
   }
 
   get amount(): BigInt {
@@ -688,21 +639,13 @@ export class Repayments extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get paymentToken(): Bytes | null {
+  get paymentToken(): Bytes {
     let value = this.get("paymentToken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value.toBytes();
   }
 
-  set paymentToken(value: Bytes | null) {
-    if (value === null) {
-      this.unset("paymentToken");
-    } else {
-      this.set("paymentToken", Value.fromBytes(value as Bytes));
-    }
+  set paymentToken(value: Bytes) {
+    this.set("paymentToken", Value.fromBytes(value));
   }
 
   get amount(): BigInt {
@@ -789,21 +732,13 @@ export class Actions extends Entity {
     this.set("minion", Value.fromString(value));
   }
 
-  get token(): Bytes | null {
+  get token(): Bytes {
     let value = this.get("token");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value.toBytes();
   }
 
-  set token(value: Bytes | null) {
-    if (value === null) {
-      this.unset("token");
-    } else {
-      this.set("token", Value.fromBytes(value as Bytes));
-    }
+  set token(value: Bytes) {
+    this.set("token", Value.fromBytes(value));
   }
 
   get amount(): BigInt | null {

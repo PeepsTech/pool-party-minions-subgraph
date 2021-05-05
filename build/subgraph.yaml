@@ -45,13 +45,16 @@ templates:
         - Protocols
         - Proposals
         - Balances
+        - Actions
+        - Members
+        - Rewards
       abis:
         - name: AaveParty
           file: AavePartyTemplate/abis/AaveParty.json
       eventHandlers:
         - event: Canceled(uint256,uint256,string)
           handler: handleCancel
-        - event: CollateralWithdrawExecuted(uint256)
+        - event: CollateralWithdrawExecuted(uint256,uint256)
           handler: handleCollateralWithdrawEx
         - event: DepositExecuted(uint256)
           handler: handleDepositEx
@@ -67,9 +70,9 @@ templates:
           handler: handlePropDeposit
         - event: ProposeLoan(uint256,address,address,address,uint256,uint256)
           handler: handlePropLoan
-        - event: ProposeRepayLoan(uint256,address,address,uint256,address)
+        - event: ProposeRepayLoan(uint256,address,address,uint256,uint256,address)
           handler: handlePropRepayLoan
-        - event: ProposeToggleEarnings(address)
+        - event: ProposeToggleEarnings(uint256,address,address)
           handler: handlePropToggleEarnings
         - event: RepayLoanExecuted(uint256)
           handler: handleRepayLoanEx

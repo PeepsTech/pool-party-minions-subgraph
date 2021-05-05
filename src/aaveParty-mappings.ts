@@ -4,6 +4,7 @@ import { BigInt,
          Address,
          Bytes,
          ByteArray,
+         Result
         } from "@graphprotocol/graph-ts";
 
 import { Canceled,
@@ -18,8 +19,8 @@ import { Canceled,
          ProposeRepayLoan, // done
          ProposeToggleEarnings, // done
          RepayLoanExecuted, // done
-         WithdrawToDAO,
-         WithdrawToMinion,
+         WithdrawToDAO, // done
+         WithdrawToMinion, // done
          AaveParty} from "../generated/templates/AavePartyTemplate/AaveParty";
 
 import { Minion, 
@@ -33,15 +34,15 @@ import { Minion,
         Actions, 
         Members,
         Rewards } from "../generated/schema";
-import { forEach } from "core-js/core/array";
 
+// @DEV - ADD CHECKS FOR PROTOCOLS SO IT"S LOAD OR CREATE
 
-function getDAO(minionAddress: Bytes): Bytes | null {
+function getDAO(minionAddress: Bytes): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
   let result = contract.try_dao();
   if (result.reverted) {
     log.info("^^^^^ loadMoloch contract call reverted. moloch address: {}", [
-      result.toString(),
+      result.value.toString(),
     ]);
     return null;
   }
@@ -49,12 +50,12 @@ function getDAO(minionAddress: Bytes): Bytes | null {
   return result.value;
 }
 
-function getProtocol(minionAddress: Bytes): Bytes | null {
+function getProtocol(minionAddress: Bytes): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
   let result = contract.try_aavePool();
   if (result.reverted) {
     log.info("^^^^^ loadMoloch contract call reverted. aave address: {}", [
-      result.toString(),
+      result.value.toString(),
     ]);
     return null;
   }
@@ -62,31 +63,23 @@ function getProtocol(minionAddress: Bytes): Bytes | null {
   return result.value;
 }
 
-function getAToken(minionAddress: Bytes, token: Bytes): Bytes | null {
+function getAToken(minionAddress: Bytes, token: Address): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
-  let aTokens = {};
-  aTokens[Symbol.iterator] = contract.try_getAaveTokenAddresses(token);
-  let aToken = aTokens[0];
-  return aToken.toString();
+  let result = contract.try_getAaveTokenAddresses(token);
+  return result.value.value0;
 }
 
-function getSToken(minionAddress: Bytes, token: Bytes): Bytes | null {
+function getSToken(minionAddress: Bytes, token: Address): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
-  let aTokens = {};
-  aTokens[Symbol.iterator] = contract.try_getAaveTokenAddresses(token);
-  let sToken = aTokens[1];
-  return sToken;
+  let result = contract.try_getAaveTokenAddresses(token);
+  return result.value.value1;
 }
 
-function getVToken(minionAddress: Bytes, token: Bytes): Bytes | null {
+function getVToken(minionAddress: Bytes, token: Address): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
-  let aTokens = {};
-  aTokens[Symbol.iterator] = contract.try_getAaveTokenAddresses(token);
-  let vToken = aTokens[2];
-  return vToken;
+  let result = contract.try_getAaveTokenAddresses(token);
+  return result.value.value2;
 }
-
-
 
 function loadOrCreateTokenBalance(
   minionId: string,
@@ -193,8 +186,9 @@ export function handleCollateralWithdrawEx(event: CollateralWithdrawExecuted): v
   .concat(event.params.proposalId.toString());
   let withdraw = Withdraws.load(withdrawId);
 
-  for (let i = 0; i < withdraw.recieptToken.length; i++) {
-    let token = withdraw.recieptToken[i];
+  let tokens = withdraw.recieptToken;
+  for (let i = 0; i < tokens.length; i++) {
+    let token = tokens[i];
     addToBalance(minionId, token, withdraw.amount, withdraw.protocol);
   }
   
@@ -226,7 +220,10 @@ export function handleEarningsToggled(event: EarningsToggled): void {
   .concat(event.params.proposalId.toString());
   let action = Actions.load(actionId);
 
-  minion.earningsTokens.push(action.token);
+  if (action !== null){
+    minion.earningsTokens.push(action.token);
+  }
+
   minion.save();
 
   proposal.executed = true;
@@ -257,8 +254,10 @@ export function handleDepositEx(event: DepositExecuted): void {
 
   addToBalance(minionId, deposit.recieptToken, deposit.amount, deposit.protocol);
 
-  for (let i = 0; i < deposit.depositToken.length; i++) {
-    let token = deposit.depositToken[i];
+
+  let tokens = deposit.depositToken;
+  for (let i = 0; i < tokens.length; i++) {
+    let token = tokens[i];
     subtractFromBalance(minionId, token, deposit.amount, deposit.protocol);
   }
 
@@ -544,12 +543,10 @@ export function handlePropLoan(event: ProposeLoan): void {
   if (event.params.rateMode == BigInt.fromI32(1)) {
     let sToken = getSToken(event.address, event.params.token);
     loan.recieptToken = sToken;
-  } else if (event.params.rateMode == BigInt.fromI32(2)) {
+  } else {
     let vToken = getVToken(event.address, event.params.token);
     loan.recieptToken = vToken;
-  } else {
-    return null;
-  }
+  } 
 
   loan.dao = molochAddress;
   loan.minion = minionId;
@@ -611,11 +608,9 @@ export function handlePropRepayLoan(event: ProposeRepayLoan): void {
   if (event.params.rateMode == BigInt.fromI32(1)) {
     let sToken = getSToken(event.address, event.params.token);
     repay.paymentToken = sToken;
-  } else if (event.params.rateMode == BigInt.fromI32(2)) {
+  } else {
     let vToken = getVToken(event.address, event.params.token);
     repay.paymentToken = vToken;
-  } else {
-    return null;
   }
 
   repay.dao = molochAddress;

@@ -27,8 +27,8 @@ type Deposits @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  depositToken: [Bytes!] # address(es)
-  recieptToken: Bytes# address
+  depositToken: [Bytes!]! # address(es)
+  recieptToken: Bytes!# address
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -40,7 +40,7 @@ type Withdraws @entity {
   minion: Minion! # address
   proposal: Proposals!
   withdrawToken: Bytes! # address
-  recieptToken: [Bytes!] # address
+  recieptToken: [Bytes!]! # address
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -51,7 +51,7 @@ type Loans @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  recieptToken: Bytes # address
+  recieptToken: Bytes! # address
   amount: BigInt! # address
   protocol: Protocol! 
   details: String
@@ -62,7 +62,7 @@ type Repayments @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  paymentToken: Bytes # address
+  paymentToken: Bytes! # address
   amount: BigInt! # address
   protocol: Protocol! 
   details: String
@@ -73,7 +73,7 @@ type Actions @entity{
   id: ID!
   dao: Bytes! # address
   minion: Minion! # address 
-  token: Bytes
+  token: Bytes!
   amount: BigInt # address
   proposal: Proposals!
   data: Bytes
