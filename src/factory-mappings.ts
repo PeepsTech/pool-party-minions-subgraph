@@ -1,46 +1,29 @@
-import { Deployment } from "../generated/TransmutationFactory/TransmutationFactory";
-import { SummonTransmutation } from "../generated/TransmutationV2Factory/TransmutationV2Factory";
+import { SummonAavePartyMinion } from "../generated/AavePartyFactory/AaveFactory";
+import { Minion, Protocol } from "../generated/schema";
 
-import { TransmutationTemplate } from "../generated/templates";
-import { Transmutation } from "../generated/schema";
 
-// emit Deployment(
-//   _moloch,
-//   _distributionToken,
-//   minion,
-//   transmutation,
-//   trust
-export function handleTransmutationDeployment(event: Deployment): void {
-  let transmutation = Transmutation.load(event.params.transmutation.toHex());
+export function handleSummonAaveparty(event: SummonAavePartyMinion): void {
 
-  if (transmutation == null) {
-    transmutation = new Transmutation(event.params.transmutation.toHex());
-  }
 
-  transmutation.moloch = event.params.moloch;
-  transmutation.distributionToken = event.params.distributionToken;
-  transmutation.minion = event.params.minion;
-  transmutation.transmutation = event.params.transmutation;
-  transmutation.trust = event.params.trust;
 
-  transmutation.save();
+  let minionId = (event.params.dao.toHex())
+    .concat("-minion-")
+    .concat(event.params.partyAddress.toHex());
+  let minion = new Minion(minionId);
 
-  TransmutationTemplate.create(event.params.transmutation);
-}
+  minion.molochAddress = event.params.dao;
+  minion.details = event.params.desc;
+  minion.minionType = event.params.name;
+  minion.minionAddress = event.params.partyAddress;
+  minion.createdAt = event.block.timestamp.toString();
 
-export function handleSummonTransmutation(event: SummonTransmutation): void {
-  let transmutation = Transmutation.load(event.params.transmutation.toHex());
+  minion.save();
 
-  if (transmutation == null) {
-    transmutation = new Transmutation(event.params.transmutation.toHex());
-  }
+  let protocol = new Protocol(event.params.protocol.toHex());
 
-  transmutation.moloch = event.params.moloch;
-  transmutation.distributionToken = event.params.distributionToken;
-  transmutation.minion = event.params.owner;
-  transmutation.transmutation = event.params.transmutation;
-  transmutation.capitalToken = event.params.capitalToken;
-  transmutation.details = event.params.details;
+  protocol.protocolAddress = event.params.protocol;
+  protocol.name = "Aave";
+  protocol.minion = minionId;
 
-  transmutation.save();
+  protocol.save()
 }

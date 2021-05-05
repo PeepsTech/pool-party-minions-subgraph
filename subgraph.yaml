@@ -1,67 +1,82 @@
 specVersion: 0.0.2
-description: DAOHaus Boosts Subgraph
-repository: 'https://github.com/hausdao/daohaus-boosts-subgraph'
+description: Pool-Party Minions Subgraph
+repository: ''
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: TransmutationFactory
-    network: xdai
+    name: AavePartyFactory
+    network: matic
     source:
-      address: '0x2BE7130DF2Ba6822464900cBD818BcDB8cf73d09'
-      abi: TransmutationFactory
-      startBlock: 11814810
+      address: '0x072fD3f2C27f68479EABedd5f579DC28FD97826d'
+      abi: AaveFactory
+      startBlock: 11553465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Deployment
+        - Minion
+        - Protocols
       abis:
-        - name: TransmutationFactory
-          file: ./abis/TransmutationFactory.json
+        - name: AaveFactory
+          file: ./abis/AaveFactory.json
       eventHandlers:
-        - event: 'Deployment(address,address,address,address,address)'
-          handler: handleTransmutationDeployment
-      file: ./src/factory-mappings.ts
-  - kind: ethereum/contract
-    name: TransmutationV2Factory
-    network: xdai
-    source:
-      address: '0x7F94ec015665743fE84A7f59297eD86A0470e069'
-      abi: TransmutationV2Factory
-      startBlock: 14846276
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - SummonTransmutation
-      abis:
-        - name: TransmutationV2Factory
-          file: ./abis/TransmutationV2Factory.json
-      eventHandlers:
-        - event: >-
-            SummonTransmutation(indexed address,indexed address,indexed
-            address,string,address,address)
-          handler: handleSummonTransmutation
+        - event: 'SummonAavePartyMinion(address,address,address,address,uint256,uint256,string,string)'
+          handler: handleAavePartySummon
       file: ./src/factory-mappings.ts
 templates:
   - kind: ethereum/contract
-    name: TransmutationTemplate
-    network: xdai
+    name: AavePartyTemplate
+    network: matic
     source:
-      abi: Transmutation
+      abi: AaveParty
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.3
       language: wasm/assemblyscript
-      file: ./src/transmutation-mappings.ts
+      file: ./src/aaveparty-mappings.ts
       entities:
-        - Transmutation
+        - Minion
+        - Deposits
+        - Loans
+        - Withdraws
+        - Tokens
+        - Protocols
+        - Proposals
+        - Balances
+        - Actions
+        - Members
+        - Rewards
       abis:
-        - name: Transmutation
-          file: ./abis/Transmutation.json
+        - name: AaveParty
+          file: ./abis/AaveParty.json
       eventHandlers:
-        - event: 'Deploy(address,address,address,address)'
-          handler: handleDeploy
+        - event: 'Canceled(uint256,uint256,string)'
+          handler: handleCancel
+        - event: 'CollateralWithdrawExecuted(uint256,uint256)'
+          handler: handleCollateralWithdrawEx
+        - event: 'DepositExecuted(uint256)'
+          handler: handleDepositEx
+        - event: 'EarningsToggled(uint256,bool)'
+          handler: handleEarningsToggled
+        - event: 'EarningsWithdraw(address,address,uint256,address)'
+          handler: handleEarningsWithdrawn
+        - event: 'LoanExecuted(uint256)'
+          handler: handleLoanEx
+        - event: 'ProposeCollateralWithdraw(uint256,address,address,uint256,address)'
+          handler: handlePropCollateralWithdraw
+        - event: 'ProposeDeposit(uint256,address,address,uint256)'
+          handler: handlePropDeposit
+        - event: 'ProposeLoan(uint256,address,address,address,uint256,uint256)'
+          handler: handlePropLoan
+        - event: 'ProposeRepayLoan(uint256,address,address,uint256,uint256,address)'
+          handler: handlePropRepayLoan
+        - event: 'ProposeToggleEarnings(uint256,address,address)'
+          handler: handlePropToggleEarnings
+        - event: 'RepayLoanExecuted(uint256)'
+          handler: handleRepayLoanEx
+        - event: 'WithdrawToDAO(uint256,address,address,uint256)'
+          handler: handleWithdrawToDAO
+        - event: 'WithdrawToMinion(address,address,uint256)'
+          handler: handleWithdrawToMinion

@@ -1,17 +1,116 @@
-type Transmutation @entity {
+type Minion @entity {
   id: ID!
-  moloch: Bytes! # address
-  distributionToken: Bytes! # address
-  minion: Bytes! # address
-  transmutation: Bytes! # address
-  trust: Bytes # address
-  capitalToken: Bytes # address
+  createdAt: String!
+  minionAddress: Bytes!
+  molochAddress: Bytes!
+  proposals: [Proposals!] @derivedFrom(field: "minion")
+  balances: [Balances!] @derivedFrom(field: "minion")
+  deposits: [Deposits!] @derivedFrom(field: "minion")
+  withdraws:[Withdraws!] @derivedFrom(field: "minion")
+  earningsTokens: [Bytes!]
+  details: String!
+  minionType: String!
+  protocol: Protocol!
+}
+
+type Proposals @entity{
+  id: ID!
+  minion: Minion!
+  proposer: Bytes!
+  proposalId: BigInt!
+  canceled: Boolean!
+  executed: Boolean!
+}
+
+type Deposits @entity {
+  id: ID!
+  dao: Bytes! # address
+  minion: Minion! # address
+  proposal: Proposals!
+  depositToken: [Bytes!] # address(es)
+  recieptToken: Bytes# address
+  amount: BigInt! # address
+  protocol: Protocol!
   details: String
 }
 
-type UberHausMembership @entity {
+type Withdraws @entity {
   id: ID!
-  moloch: Bytes! # address
-  minion: Bytes! # address
-  uberHaus: Bytes! # address
+  dao: Bytes! # address
+  minion: Minion! # address
+  proposal: Proposals!
+  withdrawToken: Bytes! # address
+  recieptToken: [Bytes!] # address
+  amount: BigInt! # address
+  protocol: Protocol!
+  details: String
 }
+
+type Loans @entity {
+  id: ID!
+  dao: Bytes! # address
+  minion: Minion! # address
+  proposal: Proposals!
+  recieptToken: Bytes # address
+  amount: BigInt! # address
+  protocol: Protocol! 
+  details: String
+}
+
+type Repayments @entity {
+  id: ID!
+  dao: Bytes! # address
+  minion: Minion! # address
+  proposal: Proposals!
+  paymentToken: Bytes # address
+  amount: BigInt! # address
+  protocol: Protocol! 
+  details: String
+}
+
+
+type Actions @entity{
+  id: ID!
+  dao: Bytes! # address
+  minion: Minion! # address 
+  token: Bytes
+  amount: BigInt # address
+  proposal: Proposals!
+  data: Bytes
+  details: String
+  type: Bytes
+  protocol: Protocol! 
+
+}
+
+type Protocol @entity {
+  id: ID! # address 
+  protocolAddress: Bytes! #address 
+  minion: Minion!
+  name: String
+}
+
+type Balances @entity {
+  id: ID! 
+  minion: Minion!
+  protocol: Protocol
+  tokenAddress: Bytes!
+  balance: BigInt!
+}
+
+type Members @entity {
+  id: ID!
+  minion: Minion!
+  memberAddress: Bytes!
+  rewards: [Rewards!] @derivedFrom(field: "member")
+}
+
+type Rewards @entity {
+  id: ID!
+  minion: Minion!
+  member: Members!
+  token: Bytes!
+  amount: BigInt!
+}
+
+
