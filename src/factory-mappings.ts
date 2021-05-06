@@ -2,8 +2,7 @@ import { SummonAavePartyMinion } from "../generated/AavePartyFactory/AaveFactory
 import { Minion, Protocol } from "../generated/schema";
 
 
-export function handleSummonAaveparty(event: SummonAavePartyMinion): void {
-
+export function handleAavePartySummon(event: SummonAavePartyMinion): void {
 
 
   let minionId = (event.params.dao.toHex())

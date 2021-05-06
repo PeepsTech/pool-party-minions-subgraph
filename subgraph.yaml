@@ -8,9 +8,9 @@ dataSources:
     name: AavePartyFactory
     network: matic
     source:
-      address: '0x072fD3f2C27f68479EABedd5f579DC28FD97826d'
+      address: '0x3D1FF8066B858b1d69Df0e28BB51d50b367f98B6'
       abi: AaveFactory
-      startBlock: 11553465
+      startBlock: 13133937
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

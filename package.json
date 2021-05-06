@@ -1,8 +1,8 @@
 {
-  "name": "daohaus-boosts",
+  "name": "pool-party-matic",
   "version": "0.1.0",
   "scripts": {
-    "create": "graph create odyssy-automaton/daohaus-boosts --node https://api.thegraph.com/deploy/",
+    "create": "graph create wswarren-pool-party-matic --node https://api.thegraph.com/deploy/",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy-matic": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ wswarren12/pool-party-matic",

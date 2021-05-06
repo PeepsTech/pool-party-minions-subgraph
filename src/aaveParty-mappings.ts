@@ -461,12 +461,6 @@ export function handlePropDeposit(event: ProposeDeposit): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(proposalId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   let depositId = minion.minionAddress.toHexString()
     .concat("-proposal-")
@@ -526,12 +520,6 @@ export function handlePropLoan(event: ProposeLoan): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(proposalId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   let loanId = minion.minionAddress.toHexString()
     .concat("-proposal-")
@@ -591,12 +579,6 @@ export function handlePropRepayLoan(event: ProposeRepayLoan): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(proposalId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   let repayId = minion.minionAddress.toHexString()
     .concat("-proposal-")
@@ -643,12 +625,6 @@ export function handlePropEarningsToggled(event: ProposeToggleEarnings): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(protocolId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   let proposalId = minion.minionAddress.toHexString()
     .concat("-proposal-")
@@ -724,12 +700,6 @@ export function handleWithdrawToDAO(event: WithdrawToDAO): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(protocolId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   let proposalId = minion.minionAddress.toHexString()
     .concat("-proposal-")
@@ -742,7 +712,6 @@ export function handleWithdrawToDAO(event: WithdrawToDAO): void {
   proposal.save();
 
   subtractFromBalance(minionId, event.params.token, event.params.amount, protocolId);
-
 }
 
 export function handleWithdrawToMinion(event: WithdrawToMinion): void {
@@ -765,12 +734,6 @@ export function handleWithdrawToMinion(event: WithdrawToMinion): void {
   let protocolId = minion.minionAddress.toHexString()
   .concat("-protocol-")
   .concat(protocolAddress.toString());
-  let protocol = new Protocol(protocolId);
-
-  protocol.protocolAddress = protocolAddress;
-  protocol.minion = minionId;
-  protocol.name = "Aave";
-  protocol.save();
 
   addToBalance(minionId, event.params.token, event.params.amount, protocolId);
 
