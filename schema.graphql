@@ -4,7 +4,7 @@ type Minion @entity {
   minionAddress: Bytes!
   molochAddress: Bytes!
   proposals: [Proposals!] @derivedFrom(field: "minion")
-  balances: [Balances!] @derivedFrom(field: "minion")
+  balances: [Tokens!] @derivedFrom(field: "minion")
   deposits: [Deposits!] @derivedFrom(field: "minion")
   withdraws:[Withdraws!] @derivedFrom(field: "minion")
   earningsTokens: [Bytes!]
@@ -27,8 +27,8 @@ type Deposits @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  depositToken: [Bytes!]! # address(es)
-  recieptToken: Bytes!# address
+  depositToken: [Tokens!]! # address(es)
+  receiptToken: Tokens!# address
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -39,8 +39,8 @@ type Withdraws @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  withdrawToken: Bytes! # address
-  recieptToken: [Bytes!]! # address
+  withdrawToken: Tokens! # address
+  receiptToken: [Tokens!]! 
   amount: BigInt! # address
   protocol: Protocol!
   details: String
@@ -51,7 +51,7 @@ type Loans @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  recieptToken: Bytes! # address
+  receiptToken: Tokens! # address
   amount: BigInt! # address
   protocol: Protocol! 
   details: String
@@ -62,7 +62,7 @@ type Repayments @entity {
   dao: Bytes! # address
   minion: Minion! # address
   proposal: Proposals!
-  paymentToken: Bytes! # address
+  paymentToken: Tokens! # address
   amount: BigInt! # address
   protocol: Protocol! 
   details: String
@@ -90,12 +90,18 @@ type Protocol @entity {
   name: String
 }
 
-type Balances @entity {
+type Tokens @entity {
   id: ID! 
   minion: Minion!
   protocol: Protocol
   tokenAddress: Bytes!
+  tokenSymbol: String
   balance: BigInt!
+  rewardsOn: Boolean
+  deposits: [Deposits!] @derivedFrom(field: "depositToken")
+  withdraws: [Withdraws!] @derivedFrom(field: "receiptToken")
+  loans: [Loans!] @derivedFrom(field: "receiptToken")
+  repayments: [Repayments!] @derivedFrom(field: "paymentToken")
 }
 
 type Members @entity {
@@ -112,5 +118,3 @@ type Rewards @entity {
   token: Bytes!
   amount: BigInt!
 }
-
-

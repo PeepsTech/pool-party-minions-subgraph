@@ -30,12 +30,14 @@ import { Minion,
         Withdraws, 
         Protocol,
         Proposals,
-        Balances,
+        Tokens,
         Actions, 
         Members,
         Rewards } from "../generated/schema";
 
-// @DEV - ADD CHECKS FOR PROTOCOLS SO IT"S LOAD OR CREATE
+import { Erc20 } from "../generated/templates/AavePartyTemplate/Erc20";
+import { Erc20Bytes32 } from "../generated/templates/AavePartyTemplate/Erc20Bytes32";
+
 
 function getDAO(minionAddress: Bytes): Bytes {
   let contract = AaveParty.bind(minionAddress as Address);
@@ -81,67 +83,75 @@ function getVToken(minionAddress: Bytes, token: Address): Bytes {
   return result.value.value2;
 }
 
+function getTokenSymbol(tokenAddress: Bytes): String {
+  let contract = Erc20.bind(tokenAddress as Address);
+  let symbol = contract.try_symbol();
+  return symbol.value;
+}
+
 function loadOrCreateTokenBalance(
   minionId: string,
-  token: Bytes,
+  thistoken: Bytes,
   protocolId: string
-): Balances | null {
+): Tokens | null {
   let minion = Minion.load(minionId);
-  let balanceId = minion.minionAddress.toHexString().concat("-balance-").concat(token.toHexString());
-  let tokenBalance = Balances.load(balanceId);
-  let tokenBalanceDNE = tokenBalance == null ? true : false;
-  if (tokenBalanceDNE) {
-    let balanceId = minion.minionAddress.toHexString()
-    .concat("-balance-")
-    .concat(token.toHexString());
-    let tokenBalance = new Balances(balanceId);
+  let TokenId = minion.minionAddress.toHexString().concat("-Token-").concat(thistoken.toHexString());
+  let t = Tokens.load(TokenId);
+  let tokenTokenDNE = t == null ? true : false;
+  if (tokenTokenDNE) {
+    let TokenId = minion.minionAddress.toHexString()
+    .concat("-Token-")
+    .concat(thistoken.toHexString());
+    let t = new Tokens(TokenId);
 
-    tokenBalance.minion = minionId;
-    tokenBalance.tokenAddress = token;
-    tokenBalance.balance = BigInt.fromI32(0);
-    tokenBalance.protocol = protocolId;
+    t.minion = minionId;
+    t.tokenAddress = thistoken;
+    t.balance = BigInt.fromI32(0);
+    t.tokenSymbol = getTokenSymbol(thistoken).toString();
+    t.rewardsOn = false;
+    t.protocol = protocolId;
 
-    tokenBalance.save();
-    return tokenBalance;
+    t.save();
+    return t;
   } else {
-    return tokenBalance;
+    return t;
   }
 }
 
-function addToBalance(
+function addToToken(
   minionId: string,
   token: Bytes,
   amount: BigInt,
   protocolId: string
 ): string {
   let minion = Minion.load(minionId);
-  let balanceId = minion.minionAddress.toHexString().concat("-balance-").concat(token.toHexString());
-  let balance: Balances | null = loadOrCreateTokenBalance(
+  let TokenId = minion.minionAddress.toHexString().concat("-Token-").concat(token.toHexString());
+  let Token: Tokens | null = loadOrCreateTokenBalance(
     minionId,
     token,
     protocolId
   );
-  balance.balance = balance.balance.plus(amount);
-  balance.save();
-  return balanceId;
+  Token.balance = Token.balance.plus(amount);
+  Token.save();
+  return TokenId;
 }
 
-function subtractFromBalance(
+function subtractFromToken(
   minionId: string,
   token: Bytes,
   amount: BigInt,
   protocolId: string
 ): string {
   let minion = Minion.load(minionId);
-  let balanceId = minion.minionAddress.toHexString().concat("-balance-").concat(token.toHexString());
-  let balance: Balances | null = loadOrCreateTokenBalance(
+  let TokenId = minion.minionAddress.toHexString().concat("-Token-").concat(token.toHexString());
+  let Token: Tokens | null = loadOrCreateTokenBalance(
     minionId,
     token,
     protocolId
   );
-  balance.balance = balance.balance.minus(amount);
-  balance.save();
-  return balanceId;
+  Token.balance = Token.balance.minus(amount);
+  Token.save();
+  return TokenId;
 }
 
 export function handleCancel(event: Canceled): void {
@@ -186,13 +196,14 @@ export function handleCollateralWithdrawEx(event: CollateralWithdrawExecuted): v
   .concat(event.params.proposalId.toString());
   let withdraw = Withdraws.load(withdrawId);
 
-  let tokens = withdraw.recieptToken;
+  let tokens = withdraw.receiptToken;
   for (let i = 0; i < tokens.length; i++) {
-    let token = tokens[i];
-    addToBalance(minionId, token, withdraw.amount, withdraw.protocol);
+    let token = Tokens.load(tokens[i]);
+    addToToken(minionId, token.tokenAddress, withdraw.amount, withdraw.protocol);
   }
   
-  subtractFromBalance(minionId, withdraw.withdrawToken, withdraw.amount, withdraw.protocol);
+  let withdrawToken = Tokens.load(withdraw.withdrawToken);
+  subtractFromToken(minionId, withdrawToken.tokenAddress, withdraw.amount, withdraw.protocol);
 
   proposal.executed = true;
   proposal.save();
@@ -252,13 +263,14 @@ export function handleDepositEx(event: DepositExecuted): void {
   .concat(event.params.proposalId.toString());
   let deposit = Deposits.load(depositId);
 
-  addToBalance(minionId, deposit.recieptToken, deposit.amount, deposit.protocol);
+  let receiptToken = Tokens.load(deposit.recieptToken)
+  addToToken(minionId, receiptToken.tokenAddress, deposit.amount, deposit.protocol);
 
 
   let tokens = deposit.depositToken;
   for (let i = 0; i < tokens.length; i++) {
-    let token = tokens[i];
-    subtractFromBalance(minionId, token, deposit.amount, deposit.protocol);
+    let token = Tokens.load(tokens[i]);
+    subtractFromToken(minionId, token.tokenAddress, deposit.amount, deposit.protocol);
   }
 
   proposal.executed = true;
@@ -332,7 +344,7 @@ export function handleEarningsWithdraw(event: EarningsWithdraw): void {
 
   }
   
-  subtractFromBalance(minionId, event.params.token, event.params.earnings, minion.protocol)
+  subtractFromToken(minionId, event.params.token, event.params.earnings, minion.protocol)
 }
 
 export function handleLoanEx(event: LoanExecuted): void {
@@ -357,7 +369,8 @@ export function handleLoanEx(event: LoanExecuted): void {
   .concat(event.params.proposalId.toString());
   let loan = Loans.load(loanId);
 
-  addToBalance(minionId, loan.recieptToken, loan.amount, loan.protocol);
+  let receiptToken = Tokens.load(loan.receiptToken)
+  addToToken(minionId, receiptToken.tokenAddress, loan.amount, loan.protocol);
 
   proposal.executed = true;
   proposal.save();
@@ -374,8 +387,6 @@ export function handlePropCollateralWithdraw(event: ProposeCollateralWithdraw): 
     return;
   }
 
-  let aToken = getAToken(event.address, event.params.token);
-  
   let minionId = molochAddress
     .toHexString()
     .concat("-minion-")
@@ -414,13 +425,17 @@ export function handlePropCollateralWithdraw(event: ProposeCollateralWithdraw): 
 
   let tokens = event.params.token;
   for (let i = 0; i < tokens.length; i++) {
-    withdraw.recieptToken.push(event.params.token);
+    let receiptToken = loadOrCreateTokenBalance(minionId, event.params.token, protocolId)
+    withdraw.receiptToken.push(receiptToken.toString());
   }
+
+  let aTokenAddress = getAToken(event.address, event.params.token);
+  let aToken = loadOrCreateTokenBalance(minionId, aTokenAddress, protocolId);
 
   withdraw.dao = molochAddress;
   withdraw.minion = minionId;
   withdraw.proposal = proposalId;
-  withdraw.withdrawToken = aToken;
+  withdraw.withdrawToken = aToken.toString();
   withdraw.amount = event.params.amount;
   withdraw.protocol = protocolId;
   withdraw.details = "Proposal to withdraw ".concat(withdraw.withdrawToken.toString()).concat(withdraw.amount.toString());
@@ -469,17 +484,19 @@ export function handlePropDeposit(event: ProposeDeposit): void {
   let deposit = new Deposits(depositId); 
   log.info("Created new Withdraws => withdraw ID {}", [depositId]);
 
-  let aToken = getAToken(event.address, event.params.token);
+  let aTokenAddress = getAToken(event.address, event.params.token);
+  let aToken = loadOrCreateTokenBalance(minionId, aTokenAddress, protocolId);
 
   let tokens = event.params.token;
   for (let i = 0; i < tokens.length; i++) {
-    deposit.depositToken.push(event.params.token);
+    let newToken = loadOrCreateTokenBalance(minionId, event.params.token, protocolId)
+    deposit.depositToken.push(newToken.toString());
   }
 
   deposit.dao = molochAddress;
   deposit.minion = minionId;
   deposit.proposal = proposalId;
-  deposit.recieptToken = aToken;
+  deposit.receiptToken = aToken.toString();
   deposit.amount = event.params.amount;
   deposit.protocol = protocolId;
   deposit.details = "Proposal to withdraw ".concat(deposit.depositToken.toString()).concat(deposit.amount.toString());
@@ -529,11 +546,13 @@ export function handlePropLoan(event: ProposeLoan): void {
   log.info("Created new Withdraws => withdraw ID {}", [loanId]);
 
   if (event.params.rateMode == BigInt.fromI32(1)) {
-    let sToken = getSToken(event.address, event.params.token);
-    loan.recieptToken = sToken;
+    let sTokenAddress = getSToken(event.address, event.params.token);
+    let sToken = loadOrCreateTokenBalance(minionId, sTokenAddress, protocolId);
+    loan.receiptToken = sToken.toString();
   } else {
-    let vToken = getVToken(event.address, event.params.token);
-    loan.recieptToken = vToken;
+    let vTokenAddress = getVToken(event.address, event.params.token);
+    let vToken = loadOrCreateTokenBalance(minionId, vTokenAddress, protocolId);
+    loan.receiptToken = vToken.toString();
   } 
 
   loan.dao = molochAddress;
@@ -588,11 +607,13 @@ export function handlePropRepayLoan(event: ProposeRepayLoan): void {
   log.info("Created new Withdraws => withdraw ID {}", [repayId]);
 
   if (event.params.rateMode == BigInt.fromI32(1)) {
-    let sToken = getSToken(event.address, event.params.token);
-    repay.paymentToken = sToken;
+    let sTokenAddress = getSToken(event.address, event.params.token);
+    let sToken = loadOrCreateTokenBalance(minionId, sTokenAddress, protocolId);
+    repay.paymentToken = sToken.toString();
   } else {
-    let vToken = getVToken(event.address, event.params.token);
-    repay.paymentToken = vToken;
+    let vTokenAddress = getVToken(event.address, event.params.token);
+    let vToken = loadOrCreateTokenBalance(minionId, vTokenAddress, protocolId);
+    repay.paymentToken = vToken.toString();
   }
 
   repay.dao = molochAddress;
@@ -674,7 +695,8 @@ export function handleRepayLoanEx(event: RepayLoanExecuted): void {
   .concat(event.params.proposalId.toString());
   let repay = Repayments.load(repayId);
 
-  subtractFromBalance(minionId, repay.paymentToken, repay.amount, repay.protocol);
+  let paymentToken = Tokens.load(repay.paymentToken)
+  subtractFromToken(minionId, paymentToken.tokenAddress, repay.amount, repay.protocol);
 
   proposal.executed = true;
   proposal.save();
@@ -711,7 +733,7 @@ export function handleWithdrawToDAO(event: WithdrawToDAO): void {
   proposal.executed = true;
   proposal.save();
 
-  subtractFromBalance(minionId, event.params.token, event.params.amount, protocolId);
+  subtractFromToken(minionId, event.params.token, event.params.amount, protocolId);
 }
 
 export function handleWithdrawToMinion(event: WithdrawToMinion): void {
@@ -735,7 +757,7 @@ export function handleWithdrawToMinion(event: WithdrawToMinion): void {
   .concat("-protocol-")
   .concat(protocolAddress.toString());
 
-  addToBalance(minionId, event.params.token, event.params.amount, protocolId);
+  addToToken(minionId, event.params.token, event.params.amount, protocolId);
 
 }
 

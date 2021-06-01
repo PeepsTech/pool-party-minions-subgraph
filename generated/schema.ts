@@ -315,22 +315,22 @@ export class Deposits extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get depositToken(): Array<Bytes> {
+  get depositToken(): Array<string> {
     let value = this.get("depositToken");
-    return value.toBytesArray();
+    return value.toStringArray();
   }
 
-  set depositToken(value: Array<Bytes>) {
-    this.set("depositToken", Value.fromBytesArray(value));
+  set depositToken(value: Array<string>) {
+    this.set("depositToken", Value.fromStringArray(value));
   }
 
-  get recieptToken(): Bytes {
-    let value = this.get("recieptToken");
-    return value.toBytes();
+  get receiptToken(): string {
+    let value = this.get("receiptToken");
+    return value.toString();
   }
 
-  set recieptToken(value: Bytes) {
-    this.set("recieptToken", Value.fromBytes(value));
+  set receiptToken(value: string) {
+    this.set("receiptToken", Value.fromString(value));
   }
 
   get amount(): BigInt {
@@ -426,22 +426,22 @@ export class Withdraws extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get withdrawToken(): Bytes {
+  get withdrawToken(): string {
     let value = this.get("withdrawToken");
-    return value.toBytes();
+    return value.toString();
   }
 
-  set withdrawToken(value: Bytes) {
-    this.set("withdrawToken", Value.fromBytes(value));
+  set withdrawToken(value: string) {
+    this.set("withdrawToken", Value.fromString(value));
   }
 
-  get recieptToken(): Array<Bytes> {
-    let value = this.get("recieptToken");
-    return value.toBytesArray();
+  get receiptToken(): Array<string> {
+    let value = this.get("receiptToken");
+    return value.toStringArray();
   }
 
-  set recieptToken(value: Array<Bytes>) {
-    this.set("recieptToken", Value.fromBytesArray(value));
+  set receiptToken(value: Array<string>) {
+    this.set("receiptToken", Value.fromStringArray(value));
   }
 
   get amount(): BigInt {
@@ -537,13 +537,13 @@ export class Loans extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get recieptToken(): Bytes {
-    let value = this.get("recieptToken");
-    return value.toBytes();
+  get receiptToken(): string {
+    let value = this.get("receiptToken");
+    return value.toString();
   }
 
-  set recieptToken(value: Bytes) {
-    this.set("recieptToken", Value.fromBytes(value));
+  set receiptToken(value: string) {
+    this.set("receiptToken", Value.fromString(value));
   }
 
   get amount(): BigInt {
@@ -639,13 +639,13 @@ export class Repayments extends Entity {
     this.set("proposal", Value.fromString(value));
   }
 
-  get paymentToken(): Bytes {
+  get paymentToken(): string {
     let value = this.get("paymentToken");
-    return value.toBytes();
+    return value.toString();
   }
 
-  set paymentToken(value: Bytes) {
-    this.set("paymentToken", Value.fromBytes(value));
+  set paymentToken(value: string) {
+    this.set("paymentToken", Value.fromString(value));
   }
 
   get amount(): BigInt {
@@ -894,7 +894,7 @@ export class Protocol extends Entity {
   }
 }
 
-export class Balances extends Entity {
+export class Tokens extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -902,17 +902,17 @@ export class Balances extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Balances entity without an ID");
+    assert(id !== null, "Cannot save Tokens entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Balances entity with non-string ID. " +
+      "Cannot save Tokens entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Balances", id.toString(), this);
+    store.set("Tokens", id.toString(), this);
   }
 
-  static load(id: string): Balances | null {
-    return store.get("Balances", id) as Balances | null;
+  static load(id: string): Tokens | null {
+    return store.get("Tokens", id) as Tokens | null;
   }
 
   get id(): string {
@@ -959,6 +959,23 @@ export class Balances extends Entity {
     this.set("tokenAddress", Value.fromBytes(value));
   }
 
+  get tokenSymbol(): string | null {
+    let value = this.get("tokenSymbol");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenSymbol(value: string | null) {
+    if (value === null) {
+      this.unset("tokenSymbol");
+    } else {
+      this.set("tokenSymbol", Value.fromString(value as string));
+    }
+  }
+
   get balance(): BigInt {
     let value = this.get("balance");
     return value.toBigInt();
@@ -966,6 +983,83 @@ export class Balances extends Entity {
 
   set balance(value: BigInt) {
     this.set("balance", Value.fromBigInt(value));
+  }
+
+  get rewardsOn(): boolean {
+    let value = this.get("rewardsOn");
+    return value.toBoolean();
+  }
+
+  set rewardsOn(value: boolean) {
+    this.set("rewardsOn", Value.fromBoolean(value));
+  }
+
+  get deposits(): Array<string> | null {
+    let value = this.get("deposits");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set deposits(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("deposits");
+    } else {
+      this.set("deposits", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get withdraws(): Array<string> | null {
+    let value = this.get("withdraws");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set withdraws(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("withdraws");
+    } else {
+      this.set("withdraws", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get loans(): Array<string> | null {
+    let value = this.get("loans");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set loans(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("loans");
+    } else {
+      this.set("loans", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get repayments(): Array<string> | null {
+    let value = this.get("repayments");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set repayments(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("repayments");
+    } else {
+      this.set("repayments", Value.fromStringArray(value as Array<string>));
+    }
   }
 }
 

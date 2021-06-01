@@ -41,16 +41,19 @@ templates:
         - Deposits
         - Loans
         - Withdraws
-        - Tokens
         - Protocols
         - Proposals
-        - Balances
+        - Tokens
         - Actions
         - Members
         - Rewards
       abis:
         - name: AaveParty
           file: ./abis/AaveParty.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
       eventHandlers:
         - event: 'Canceled(uint256,uint256,string)'
           handler: handleCancel
